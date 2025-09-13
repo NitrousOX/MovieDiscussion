@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36429.23 d17.14
+VisualStudioVersion = 17.14.36429.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "MovieDiscussionForum", "MovieDiscussionForum\MovieDiscussionForum.ccproj", "{20FFDC30-B68F-4A41-A2E0-621E911A2CB3}"
 EndProject
@@ -13,9 +13,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthMonitoringService", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthStatusService", "HealthStatusService\HealthStatusService.csproj", "{ABF8CE6B-F934-4707-8855-649069892404}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminToolsConsoleApp", "AdminToolsConsoleApp\AdminToolsConsoleApp.csproj", "{AA7ED1D0-CDE2-4A76-9010-8D6C0D332C8D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MovieDiscussion.Common", "MovieDiscussion.Common\MovieDiscussion.Common.csproj", "{C8BB7A18-63BC-41E8-A684-BC806B9820F8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{69FCF7B2-1790-4647-ADF6-75696D37CEE6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AdminToolsConsoleApp", "AdminToolsConsoleApp\AdminToolsConsoleApp.csproj", "{729159C9-6991-4975-B0A2-2B31C346F476}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,14 +43,14 @@ Global
 		{ABF8CE6B-F934-4707-8855-649069892404}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ABF8CE6B-F934-4707-8855-649069892404}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ABF8CE6B-F934-4707-8855-649069892404}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AA7ED1D0-CDE2-4A76-9010-8D6C0D332C8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AA7ED1D0-CDE2-4A76-9010-8D6C0D332C8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AA7ED1D0-CDE2-4A76-9010-8D6C0D332C8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AA7ED1D0-CDE2-4A76-9010-8D6C0D332C8D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{69FCF7B2-1790-4647-ADF6-75696D37CEE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{69FCF7B2-1790-4647-ADF6-75696D37CEE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{69FCF7B2-1790-4647-ADF6-75696D37CEE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{69FCF7B2-1790-4647-ADF6-75696D37CEE6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8BB7A18-63BC-41E8-A684-BC806B9820F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8BB7A18-63BC-41E8-A684-BC806B9820F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8BB7A18-63BC-41E8-A684-BC806B9820F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8BB7A18-63BC-41E8-A684-BC806B9820F8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{729159C9-6991-4975-B0A2-2B31C346F476}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{729159C9-6991-4975-B0A2-2B31C346F476}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{729159C9-6991-4975-B0A2-2B31C346F476}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{729159C9-6991-4975-B0A2-2B31C346F476}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
