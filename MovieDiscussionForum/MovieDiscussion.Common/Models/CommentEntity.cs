@@ -7,16 +7,14 @@ namespace MovieDiscussion.Common.Models
     {
         public CommentEntity() { }
 
-        public CommentEntity(string partitionKey, string rowKey)
+        public CommentEntity(string discussionId, string commentId)
         {
-            PartitionKey = partitionKey; 
-            RowKey = rowKey;
+            PartitionKey = discussionId; // group comments by discussion
+            RowKey = commentId;          // Guid.NewGuid().ToString()
         }
 
         public string UserId { get; set; }
         public string Text { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public int Likes { get; set; }
-        public int Dislikes { get; set; }
+        public DateTime PostedAt { get; set; }
     }
 }

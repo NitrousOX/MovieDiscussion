@@ -48,9 +48,20 @@ namespace MovieDiscussion.Common
         {
             var blobClient = storageAccount.CreateCloudBlobClient();
             var container = blobClient.GetContainerReference(containerName);
+
+            // Create the container if it doesn't exist
             await container.CreateIfNotExistsAsync();
+
+            // Set container permissions to allow public read access to blobs
+            await container.SetPermissionsAsync(
+                new BlobContainerPermissions
+                {
+                    PublicAccess = BlobContainerPublicAccessType.Blob
+                });
+
             return container;
         }
+
     }
 }
 

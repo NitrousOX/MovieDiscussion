@@ -21,10 +21,12 @@ namespace MovieDiscussionService.Controllers
             // 1️⃣ Save comment in Azure Table Storage
             CloudTable commentsTable = await StorageHelper.GetTableReferenceAsync("Comments");
 
-            var commentEntity = new CommentEntity(newComment.DiscussionId, newComment.Text)
+            var commentId = Guid.NewGuid().ToString();
+            var commentEntity = new CommentEntity(newComment.DiscussionId, commentId)
             {
                 UserId = newComment.UserId,
-                CreatedAt = DateTime.UtcNow
+                Text = newComment.Text,
+                PostedAt = DateTime.UtcNow
             };
 
             TableOperation insertOperation = TableOperation.Insert(commentEntity);
@@ -32,7 +34,7 @@ namespace MovieDiscussionService.Controllers
 
             // 2️⃣ Send message to queue with the new comment ID
             CloudQueue notificationsQueue = await StorageHelper.GetQueueReferenceAsync("commentnotificationsqueue");
-            var message = new CloudQueueMessage(commentEntity.RowKey);
+            var message = new CloudQueueMessage(commentEntity.RowKey); // RowKey = commentId
             await notificationsQueue.AddMessageAsync(message);
 
             // Redirect to the discussion details page
