@@ -13,6 +13,7 @@
     <div class="form-group">
         @Html.LabelFor(m => m.FullName)
         @Html.TextBoxFor(m => m.FullName, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.FullName, "", new { @class = "text-danger" })
     </div>
 
     <div class="form-group">
@@ -21,21 +22,30 @@
             new SelectList(new[] { "Male", "Female", "Other" }, Model.Gender),
             "Select Gender",
             new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Gender, "", new { @class = "text-danger" })
     </div>
 
     <div class="form-group">
         @Html.LabelFor(m => m.Country)
         @Html.TextBoxFor(m => m.Country, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Country, "", new { @class = "text-danger" })
     </div>
+
     <div class="form-group">
         @Html.LabelFor(m => m.City)
         @Html.TextBoxFor(m => m.City, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.City, "", new { @class = "text-danger" })
     </div>
+
     <div class="form-group">
         @Html.LabelFor(m => m.Address)
         @Html.TextBoxFor(m => m.Address, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Address, "", new { @class = "text-danger" })
     </div>
-
+    <div class="form-group form-check">
+        @Html.CheckBoxFor(m => m.IsAuthor, new { @class = "form-check-input", id = "IsAuthor" })
+        @Html.LabelFor(m => m.IsAuthor, "Is Author", new { @class = "form-check-label" })
+    </div>
     <div class="form-group">
         <label>Profile Picture</label>
         <input type="file" name="ProfileImage" class="form-control" />

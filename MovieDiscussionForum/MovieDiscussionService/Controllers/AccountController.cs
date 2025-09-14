@@ -79,7 +79,7 @@ namespace MovieDiscussionService.Controllers
             // Upload profile image to Azure Blob Storage
             string imageUrl = null;
             if (ProfileImage != null && ProfileImage.ContentLength > 0)
-            {
+             {
                 var container = await StorageHelper.GetBlobContainerReferenceAsync("profileimages");
                 string fileName = Guid.NewGuid() + System.IO.Path.GetExtension(ProfileImage.FileName);
                 CloudBlockBlob blob = container.GetBlockBlobReference(fileName);
@@ -98,7 +98,8 @@ namespace MovieDiscussionService.Controllers
                 Country = model.Country,
                 City = model.City,
                 Address = model.Address,
-                ProfileImageUrl = imageUrl
+                ProfileImageUrl = imageUrl,
+                IsAuthor = false
             };
 
             // Save user to Azure Table
@@ -135,6 +136,7 @@ namespace MovieDiscussionService.Controllers
                 Country = user.Country,
                 City = user.City,
                 Address = user.Address,
+                IsAuthor = user.IsAuthor,
                 ProfileImageUrl = user.ProfileImageUrl
             };
 
@@ -163,7 +165,7 @@ namespace MovieDiscussionService.Controllers
             if (user == null)
                 return RedirectToAction("Login");
 
-            // Update profile image if uploaded
+            // Update profile image if a new file is uploaded
             if (ProfileImage != null && ProfileImage.ContentLength > 0)
             {
                 var container = await StorageHelper.GetBlobContainerReferenceAsync("profileimages");
@@ -172,7 +174,6 @@ namespace MovieDiscussionService.Controllers
                 await blob.UploadFromStreamAsync(ProfileImage.InputStream);
 
                 user.ProfileImageUrl = blob.Uri.ToString();
-                model.ProfileImageUrl = user.ProfileImageUrl;
             }
 
             // Update other fields
@@ -181,14 +182,19 @@ namespace MovieDiscussionService.Controllers
             user.Country = model.Country;
             user.City = model.City;
             user.Address = model.Address;
+            user.IsAuthor = model.IsAuthor;
 
             // Save changes back to Azure Table
             var updateOperation = TableOperation.Replace(user);
             await table.ExecuteAsync(updateOperation);
 
+            // Ensure the view model always has the current ProfileImageUrl
+            model.ProfileImageUrl = user.ProfileImageUrl;
+
             ViewBag.Message = "Profile updated successfully!";
             return View(model);
         }
+
 
         // GET: Account/Logout
         public ActionResult Logout()
