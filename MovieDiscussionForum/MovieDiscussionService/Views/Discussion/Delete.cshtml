@@ -1,0 +1,24 @@
+﻿@model MovieDiscussion.Common.Models.DiscussionEntity
+@{
+    ViewBag.Title = "Delete Discussion";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Delete Discussion</h2>
+<h4>Are you sure you want to delete this discussion?</h4>
+
+<div class="card">
+    <div class="card-body">
+        <h5>@Model.MovieTitle (@Model.ReleaseYear)</h5>
+        <p><strong>Genre:</strong> @Model.Genre</p>
+        <p>@Model.Synopsis</p>
+    </div>
+</div>
+
+@using (Html.BeginForm("Delete", "Discussion", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="id" value="@Model.RowKey" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    @Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-secondary" })
+}

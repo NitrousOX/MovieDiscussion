@@ -1,0 +1,60 @@
+﻿@model MovieDiscussionService.Models.DiscussionViewModel
+@{
+    ViewBag.Title = "Edit Discussion";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Edit Discussion</h2>
+
+@using (Html.BeginForm("Edit", "Discussion", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(m => m.Id)
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.MovieTitle)
+        @Html.TextBoxFor(m => m.MovieTitle, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.MovieTitle, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.ReleaseYear)
+        @Html.TextBoxFor(m => m.ReleaseYear, new { @class = "form-control", type = "number" })
+        @Html.ValidationMessageFor(m => m.ReleaseYear, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Genre)
+        @Html.TextBoxFor(m => m.Genre, new { @class = "form-control" })
+        @Html.ValidationMessageFor(m => m.Genre, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.IMDBRating)
+        @Html.TextBoxFor(m => m.IMDBRating, new { @class = "form-control", type = "number", step = "0.1" })
+        @Html.ValidationMessageFor(m => m.IMDBRating, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.DurationMinutes)
+        @Html.TextBoxFor(m => m.DurationMinutes, new { @class = "form-control", type = "number" })
+        @Html.ValidationMessageFor(m => m.DurationMinutes, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(m => m.Synopsis)
+        @Html.TextAreaFor(m => m.Synopsis, new { @class = "form-control", rows = 5 })
+        @Html.ValidationMessageFor(m => m.Synopsis, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-group">
+        <label>Cover Image</label>
+        <input type="file" name="CoverImage" class="form-control" />
+        @if (!string.IsNullOrEmpty(Model.CoverImageUrl))
+        {
+            <img src="@Model.CoverImageUrl" class="img-thumbnail mt-2" style="max-height:150px;" />
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+}

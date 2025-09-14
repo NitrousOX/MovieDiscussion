@@ -42,8 +42,9 @@ namespace MovieDiscussionService.Controllers
                 Session["Username"] = user.FullName;
                 Session["Email"] = user.RowKey;
                 Session["ProfileImageUrl"] = user.ProfileImageUrl;
+                Session["IsAuthor"] = user.IsAuthor;
 
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Discussion");
             }
 
             ViewBag.Message = "Invalid email or password";

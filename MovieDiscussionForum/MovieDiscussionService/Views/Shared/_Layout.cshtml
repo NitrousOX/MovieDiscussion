@@ -1,6 +1,7 @@
 ﻿@{
     Layout = null;
     var name = Session["Username"] as string; // Using session for now
+    var isAuthor = Session["IsAuthor"] != null && (bool)Session["IsAuthor"];
 }
 
 <!DOCTYPE html>
@@ -27,9 +28,12 @@
                     <li class="nav-item">
                         @Html.ActionLink("Discussions", "Index", "Discussion", null, new { @class = "nav-link" })
                     </li>
-                    <li class="nav-item">
-                        @Html.ActionLink("Create Discussion", "Create", "Discussion", null, new { @class = "nav-link" })
-                    </li>
+                    @if (isAuthor)
+                    {
+                        <li class="nav-item">
+                            @Html.ActionLink("Create Discussion", "Create", "Discussion", null, new { @class = "nav-link" })
+                        </li>
+                    }
                 </ul>
 
                 @if (!string.IsNullOrEmpty(name))
