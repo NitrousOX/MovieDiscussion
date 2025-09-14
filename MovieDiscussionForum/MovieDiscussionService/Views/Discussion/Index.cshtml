@@ -1,0 +1,37 @@
+﻿@model IEnumerable<MovieDiscussion.Common.Models.DiscussionEntity>
+@{
+    ViewBag.Title = "All Discussions";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var isAuthor = Session["IsAuthor"] != null && (bool)Session["IsAuthor"];
+}
+
+<h2>All Discussions</h2>
+
+<div class="row">
+    @foreach (var discussion in Model)
+    {
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                @if (!string.IsNullOrEmpty(discussion.CoverImageUrl))
+                {
+                    <img src="@discussion.CoverImageUrl" class="card-img-top discussion-img" alt="Cover Image">
+                }
+                <div class="card-body">
+                    <h5 class="card-title">@discussion.MovieTitle (@discussion.ReleaseYear)</h5>
+                    <p><strong>Genre:</strong> @discussion.Genre</p>
+                    <p><strong>IMDB Rating:</strong> @discussion.IMDBRating</p>
+                    <p><strong>Duration:</strong> @discussion.DurationMinutes mins</p>
+                    <p>@discussion.Synopsis</p>
+
+                    @if (isAuthor)
+                    {
+                        <div class="mt-2">
+                            @Html.ActionLink("Edit", "Edit", "Discussion", new { id = discussion.RowKey }, new { @class = "btn btn-sm btn-primary" })
+                            @Html.ActionLink("Delete", "Delete", "Discussion", new { id = discussion.RowKey }, new { @class = "btn btn-sm btn-danger ml-2" })
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

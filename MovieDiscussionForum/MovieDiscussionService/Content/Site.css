@@ -18,3 +18,11 @@ select,
 textarea {
     max-width: 280px;
 }
+
+.discussion-img {
+    width: 100%; /* always span card width */
+    height: 250px; /* fixed height for uniformity */
+    object-fit: cover; /* crop image to fill box without distortion */
+    border-top-left-radius: .25rem; /* keep bootstrap card rounded corners */
+    border-top-right-radius: .25rem;
+}

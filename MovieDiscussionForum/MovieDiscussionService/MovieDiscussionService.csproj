@@ -140,6 +140,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\CommentModel.cs" />
+    <Compile Include="Models\DiscussionViewModel.cs" />
     <Compile Include="Models\EditProfileViewModel.cs" />
     <Compile Include="Models\LoginViewModel.cs" />
     <Compile Include="Models\RegisterViewModel.cs" />
@@ -200,11 +201,14 @@
     <Content Include="Views\Account\Register.cshtml" />
     <Content Include="Views\Account\Login.cshtml" />
     <Content Include="Views\Account\Edit.cshtml" />
+    <Content Include="Views\Discussion\Index.cshtml" />
+    <Content Include="Views\Discussion\Create.cshtml" />
+    <Content Include="Views\Discussion\Edit.cshtml" />
+    <Content Include="Views\Discussion\Delete.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\Comments\" />
-    <Folder Include="Views\Discussion\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
