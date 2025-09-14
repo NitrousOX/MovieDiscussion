@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Models\CommentEntity.cs" />
     <Compile Include="Models\DiscussionEntity.cs" />
+    <Compile Include="Models\ReactionEntity.cs" />
     <Compile Include="Models\UserEntity.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StorageHelper.cs" />

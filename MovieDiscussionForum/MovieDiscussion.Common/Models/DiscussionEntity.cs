@@ -7,18 +7,18 @@ namespace MovieDiscussion.Common.Models
     {
         public DiscussionEntity() { }
 
-        public DiscussionEntity(string genre, string id)
+        public DiscussionEntity(string userId, string id)
         {
-            PartitionKey = genre; // group by genre
+            PartitionKey = userId; // group by author
             RowKey = id;          // unique ID for discussion
         }
 
         public string MovieTitle { get; set; }
-        public int Year { get; set; }
-        public string ImdbRating { get; set; }
+        public int ReleaseYear { get; set; }
+        public string Genre { get; set; }
+        public double IMDBRating { get; set; }
         public string Synopsis { get; set; }
-        public string Duration { get; set; }
-        public string PosterUrl { get; set; } // Blob storage path
-        public double AverageUserRating { get; set; }
+        public int DurationMinutes { get; set; }
+        public string CoverImageUrl { get; set; }
     }
 }
