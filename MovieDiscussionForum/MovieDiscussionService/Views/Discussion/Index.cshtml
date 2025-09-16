@@ -7,6 +7,7 @@
     var userReactions = ViewBag.UserReactions as Dictionary<string, bool> ?? new Dictionary<string, bool>();
     var counts = ViewBag.ReactionCounts as Dictionary<string, dynamic> ?? new Dictionary<string, dynamic>();
     var userFollows = ViewBag.UserFollows as Dictionary<string, bool> ?? new Dictionary<string, bool>();
+    var currentUser = Session["Email"]?.ToString();
 }
 
 <!-- FILTER i SORT -->
@@ -61,8 +62,7 @@
                     <p><strong>Duration:</strong> @discussion.DurationMinutes mins</p>
                     <p>@discussion.Synopsis</p>
 
-
-                    @if (isAuthor)
+                    @if (currentUser == discussion.PartitionKey)
                     {
                         <div class="mt-2">
                             @Html.ActionLink("Edit", "Edit", "Discussion", new { id = discussion.RowKey }, new { @class = "btn btn-sm btn-primary" })
