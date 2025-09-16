@@ -205,10 +205,11 @@
     <Content Include="Views\Discussion\Create.cshtml" />
     <Content Include="Views\Discussion\Edit.cshtml" />
     <Content Include="Views\Discussion\Delete.cshtml" />
+    <Content Include="Views\Comments\Comments.cshtml" />
+    <Content Include="Views\Discussion\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Comments\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />

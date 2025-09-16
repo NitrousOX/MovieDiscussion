@@ -10,12 +10,22 @@ namespace MovieDiscussion.Common.Models
 {
     public class ReactionEntity : TableEntity
     {
+        public ReactionEntity() { }
+
         public ReactionEntity(string discussionId, string userId)
         {
-            PartitionKey = discussionId; // reactions tied to discussion
-            RowKey = userId;             // one reaction per user
+            PartitionKey = discussionId;
+            RowKey = userId;
+        }
+
+        public ReactionEntity(string discussionId, string userId, bool isPositive)
+        {
+            PartitionKey = discussionId;
+            RowKey = userId;
+            IsPositive = isPositive;
         }
 
         public bool IsPositive { get; set; }
     }
+
 }

@@ -15,24 +15,70 @@ namespace MovieDiscussionService.Controllers
     {
         private const string DiscussionTableName = "Discussions";
         private const string BlobContainerName = "discussioncovers";
+        private const string ReactionTableName = "Reactions";
+        private const string FollowTableName = "Follows";
 
-        // GET: Discussion
-        public async Task<ActionResult> Index()
+        public async Task<ActionResult> Index(string searchTitle = "", string searchGenre = "", string sortBy = "", int page = 1)
         {
+            int pageSize = 3; // koliko diskusija po strani
+
             var table = await StorageHelper.GetTableReferenceAsync(DiscussionTableName);
             var query = new TableQuery<DiscussionEntity>();
-            var result = new List<DiscussionEntity>();
-            TableContinuationToken token = null;
+            var discussions = new List<DiscussionEntity>();
+            var followTable = await StorageHelper.GetTableReferenceAsync(FollowTableName);
+            var allFollows = new List<FollowEntity>();
+            var userId = Session["Email"] as string;
 
+
+            TableContinuationToken token = null;
             do
             {
                 var segment = await table.ExecuteQuerySegmentedAsync(query, token);
-                result.AddRange(segment.Results);
+                discussions.AddRange(segment.Results);
                 token = segment.ContinuationToken;
             } while (token != null);
 
-            return View(result);
+
+            TableContinuationToken fToken = null;
+            do
+            {
+                var fSeg = await followTable.ExecuteQuerySegmentedAsync(new TableQuery<FollowEntity>(), fToken);
+                allFollows.AddRange(fSeg.Results);
+                fToken = fSeg.ContinuationToken;
+            } while (fToken != null);
+
+            var userFollows = allFollows
+                .Where(f => f.RowKey == userId)
+                .ToDictionary(f => f.PartitionKey, f => f.IsFollowing);
+
+            ViewBag.UserFollows = userFollows;
+
+            // --- Filter ---
+            if (!string.IsNullOrEmpty(searchTitle))
+                discussions = discussions.Where(d => d.MovieTitle.IndexOf(searchTitle, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+
+            if (!string.IsNullOrEmpty(searchGenre))
+                discussions = discussions.Where(d => d.Genre.IndexOf(searchGenre, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
+
+            // --- Sort ---
+            /*if (sortBy == "likes")
+                discussions = discussions.OrderByDescending(d => reactionCounts.ContainsKey(d.RowKey) ? reactionCounts[d.RowKey].Likes : 0).ToList();
+            else if (sortBy == "dislikes")
+                discussions = discussions.OrderByDescending(d => reactionCounts.ContainsKey(d.RowKey) ? reactionCounts[d.RowKey].Dislikes : 0).ToList();
+            */
+            // --- Pagination ---
+            int totalItems = discussions.Count;
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            page = Math.Max(1, Math.Min(page, totalPages)); // ograniči page
+
+            var pagedDiscussions = discussions.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+
+            return View(pagedDiscussions);
         }
+
 
         // GET: Discussion/Create
         public ActionResult Create()
@@ -197,5 +243,78 @@ namespace MovieDiscussionService.Controllers
 
             return RedirectToAction("Index");
         }
+
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> ToggleFollow(string discussionId)
+        {
+            var userId = Session["Email"] as string;
+            if (string.IsNullOrEmpty(userId))
+                return new HttpUnauthorizedResult();
+
+            var table = await StorageHelper.GetTableReferenceAsync(FollowTableName);
+
+            // Proveri da li već postoji follow
+            var retrieve = TableOperation.Retrieve<FollowEntity>(discussionId, userId);
+            var result = await table.ExecuteAsync(retrieve);
+            var existing = result.Result as FollowEntity;
+
+            if (existing == null)
+            {
+                // kreiraj novi follow
+                var newFollow = new FollowEntity(discussionId, userId);
+                await table.ExecuteAsync(TableOperation.Insert(newFollow));
+                return Json(new { Following = true });
+            }
+            else
+            {
+                // ukloni follow
+                await table.ExecuteAsync(TableOperation.Delete(existing));
+                return Json(new { Following = false });
+            }
+        }
+
+        // GET: Discussion/Details/{id}
+        // GET: Discussion/Details/{id}
+        public async Task<ActionResult> Details(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return RedirectToAction("Index");
+
+            var table = await StorageHelper.GetTableReferenceAsync(DiscussionTableName);
+
+            // Traži po RowKey, ignoriši PartitionKey
+            var query = new TableQuery<DiscussionEntity>()
+                            .Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, id));
+
+            var segment = await table.ExecuteQuerySegmentedAsync(query, null);
+            var discussion = segment.Results.FirstOrDefault();
+
+            if (discussion == null)
+                return HttpNotFound();
+
+            // Uzmi komentare
+            var commentsTable = await StorageHelper.GetTableReferenceAsync("Comments");
+            var queryComments = new TableQuery<CommentEntity>()
+                                    .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, id));
+            var comments = new List<CommentEntity>();
+            TableContinuationToken token = null;
+            do
+            {
+                var seg = await commentsTable.ExecuteQuerySegmentedAsync(queryComments, token);
+                comments.AddRange(seg.Results);
+                token = seg.ContinuationToken;
+            } while (token != null);
+
+            ViewBag.DiscussionId = id;
+            ViewBag.Comments = comments.OrderBy(c => c.PostedAt).ToList();
+
+            return View(discussion);
+        }
+
+
+
     }
 }
