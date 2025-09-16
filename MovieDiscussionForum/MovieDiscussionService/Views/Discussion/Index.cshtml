@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = "All Discussions";
     Layout = "~/Views/Shared/_Layout.cshtml";
-    var isAuthor = Session["IsAuthor"] != null && (bool)Session["IsAuthor"];
+    var currentUser = Session["Email"]?.ToString();
 }
 
 <h2>All Discussions</h2>
@@ -23,7 +23,7 @@
                     <p><strong>Duration:</strong> @discussion.DurationMinutes mins</p>
                     <p>@discussion.Synopsis</p>
 
-                    @if (isAuthor)
+                    @if (currentUser == discussion.PartitionKey)
                     {
                         <div class="mt-2">
                             @Html.ActionLink("Edit", "Edit", "Discussion", new { id = discussion.RowKey }, new { @class = "btn btn-sm btn-primary" })
