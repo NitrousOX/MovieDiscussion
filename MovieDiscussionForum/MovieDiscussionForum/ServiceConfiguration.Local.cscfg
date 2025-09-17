@@ -10,6 +10,9 @@
 		<Instances count="1" />
 		<ConfigurationSettings>
 			<Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
+			<Setting name="NotificationQueueName" value="notifications"/>
+			<Setting name="NotificationLogTableName" value="NotificationLogs"/>
+			<Setting name="SendGridApiKey" value="TEST_SENDGRID_KEY"/>
 		</ConfigurationSettings>
 	</Role>
 	<Role name="HealthMonitoringService">

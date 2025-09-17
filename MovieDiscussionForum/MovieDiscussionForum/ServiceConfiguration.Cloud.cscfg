@@ -7,9 +7,12 @@
 	  </ConfigurationSettings>
   </Role>
   <Role name="NotificationService">
-    <Instances count="1" />
+    <Instances count="3" />
 	  <ConfigurationSettings>
 		  <Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
+		  <Setting name="NotificationQueueName" value="notifications"/>
+		  <Setting name="NotificationLogTableName" value="NotificationLogs"/>
+		  <Setting name="SendGridApiKey" value="SG.PROD_SENDGRID_API_KEY"/>
 	  </ConfigurationSettings>
   </Role>
   <Role name="HealthMonitoringService">

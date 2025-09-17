@@ -8,6 +8,10 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Queue;
+using Microsoft.WindowsAzure.Storage.Table;
+using SendGrid;
 
 namespace NotificationService
 {
@@ -15,6 +19,10 @@ namespace NotificationService
     {
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private readonly ManualResetEvent runCompleteEvent = new ManualResetEvent(false);
+
+        private CloudQueue _queue;
+        private CloudTable _logTable;
+        private SendGridClient _sendGridClient;
 
         public override void Run()
         {
@@ -41,9 +49,35 @@ namespace NotificationService
             // For information on handling configuration changes
             // see the MSDN topic at https://go.microsoft.com/fwlink/?LinkId=166357.
 
-            bool result = base.OnStart();
 
-            Trace.TraceInformation("NotificationService has been started");
+            try
+            {
+                string storageConn = RoleEnvironment.GetConfigurationSettingValue("StorageConnectionString");
+                var storageAccount = CloudStorageAccount.Parse(storageConn);
+
+                string queueName = RoleEnvironment.GetConfigurationSettingValue("NotificationQueueName");
+                var queueClient = storageAccount.CreateCloudQueueClient();
+                _queue = queueClient.GetQueueReference(queueName);
+                _queue.CreateIfNotExists();
+
+                string tableName = RoleEnvironment.GetConfigurationSettingValue("NotificationLogTableName");
+                var tableClient = storageAccount.CreateCloudTableClient();
+                _logTable = tableClient.GetTableReference(tableName);
+                _logTable.CreateIfNotExists();
+
+                string apiKey = RoleEnvironment.GetConfigurationSettingValue("SendGridApiKey");
+                _sendGridClient = new SendGridClient(apiKey);
+
+                Trace.TraceInformation("NotificationService initialized successfully.");
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError("Error during OnStart initialization: " + e.Message);
+                throw; // ako pukne, Azure ce pokusati restart
+            }
+
+
+            bool result = base.OnStart();
 
             return result;
         }
@@ -52,21 +86,68 @@ namespace NotificationService
         {
             Trace.TraceInformation("NotificationService is stopping");
 
-            this.cancellationTokenSource.Cancel();
-            this.runCompleteEvent.WaitOne();
+            try
+            {
+                this.cancellationTokenSource.Cancel();
+                this.runCompleteEvent.WaitOne();
 
-            base.OnStop();
+                _queue = null;
+                _logTable = null;
+                _sendGridClient = null;
 
-            Trace.TraceInformation("NotificationService has stopped");
+                Trace.TraceInformation("NotificationService resources released.");
+            }
+            catch (Exception e)
+            {
+                Trace.TraceError("Error while stopping NotificationService: " + e.Message);
+            }
+            finally
+            {
+                base.OnStop();
+
+                Trace.TraceInformation("NotificationService has stopped");
+            }
+            
         }
 
         private async Task RunAsync(CancellationToken cancellationToken)
         {
-            // TODO: Replace the following with your own logic.
+            
             while (!cancellationToken.IsCancellationRequested)
             {
-                Trace.TraceInformation("Working");
-                await Task.Delay(1000);
+
+                try
+                {
+                    var msg = await _queue.GetMessageAsync();
+
+                    if(msg != null)
+                    {
+                        Trace.TraceInformation("Message received: " + msg.AsString);
+
+                        // TODO:
+                        // 1. Preuzeti detalje komentara iz baze
+                        // 2. Naci pretplacene korisnike
+                        // 3. Poslati mejlove
+                        // 4. Logovati u tabelu
+
+                        // Ako je sve proslo OK, obrisi poruku iz queue-a
+                        await _queue.DeleteMessageAsync(msg);
+
+                    }
+                    else
+                    {
+                        // Ako nema poruka, malo odspavaj
+                        await Task.Delay(3000, cancellationToken);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Trace.TraceError("Error in RunSync: " + e.Message);
+                    await Task.Delay(5000, cancellationToken);
+                }
+
+
+                
             }
         }
     }
