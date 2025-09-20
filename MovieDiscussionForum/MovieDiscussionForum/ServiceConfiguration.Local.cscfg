@@ -4,15 +4,16 @@
 		<Instances count="1" />
 		<ConfigurationSettings>
 			<Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
+			<Setting name="NotificationQueueName" value="commentnotificationsqueue"/>
 		</ConfigurationSettings>
 	</Role>
 	<Role name="NotificationService">
 		<Instances count="1" />
 		<ConfigurationSettings>
 			<Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
-			<Setting name="NotificationQueueName" value="notifications"/>
+			<Setting name="NotificationQueueName" value="commentnotificationsqueue"/>
 			<Setting name="NotificationLogTableName" value="NotificationLogs"/>
-			<Setting name="SendGridApiKey" value="TEST_SENDGRID_KEY"/>
+			<Setting name="SendGridApiKey" value="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"/>
 		</ConfigurationSettings>
 	</Role>
 	<Role name="HealthMonitoringService">
