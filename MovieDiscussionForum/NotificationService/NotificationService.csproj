@@ -105,6 +105,12 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MovieDiscussion.Common\MovieDiscussion.Common.csproj">
+      <Project>{C8BB7A18-63BC-41E8-A684-BC806B9820F8}</Project>
+      <Name>MovieDiscussion.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

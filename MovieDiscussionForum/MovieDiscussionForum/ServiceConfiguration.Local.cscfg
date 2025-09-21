@@ -8,6 +8,7 @@
 		<Instances count="1" />
 		<ConfigurationSettings>
 			<Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
+			<Setting name="NotificationQueueName" value="commentnotificationsqueue"/>
 		</ConfigurationSettings>
 	</Role>
 
