@@ -4,18 +4,25 @@
     <Instances count="1" />
 	  <ConfigurationSettings>
 		  <Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
+		  <Setting name="NotificationQueueName" value="commentnotificationsqueue"/>
 	  </ConfigurationSettings>
   </Role>
   <Role name="NotificationService">
-    <Instances count="1" />
+    <Instances count="3" />
 	  <ConfigurationSettings>
 		  <Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
+		  <Setting name="NotificationQueueName" value="commentnotificationsqueue"/>
+		  <Setting name="NotificationLogTableName" value="NotificationLogs"/>
+		  <Setting name="SendGridApiKey" value="SET_API_KEY"/>
 	  </ConfigurationSettings>
   </Role>
   <Role name="HealthMonitoringService">
     <Instances count="1" />
 	  <ConfigurationSettings>
 		  <Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
+		  <Setting name="SendGridApiKey" value="SET_API_KEY" />
+		  <Setting name="MovieDiscussionHealthUrl" value="https://YOUR_CLOUD_APP.azurewebsites.net/health-monitoring" />
+		  <Setting name="NotificationHealthUrl" value="https://YOUR_CLOUD_APP.azurewebsites.net/notification-health" />
 	  </ConfigurationSettings>
   </Role>
   <NetworkConfiguration>

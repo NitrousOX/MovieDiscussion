@@ -1,0 +1,80 @@
+﻿@model MovieDiscussion.Common.Models.DiscussionEntity
+@{
+    var userEmail = Session["Email"] as string;
+    var comments = ViewBag.Comments as List<MovieDiscussion.Common.Models.CommentEntity> ?? new List<MovieDiscussion.Common.Models.CommentEntity>();
+}
+
+<h2>@Model.MovieTitle (@Model.ReleaseYear)</h2>
+<p>@Model.Synopsis</p>
+
+<h4>Comments (@comments.Count)</h4>
+<div class="comments-container">
+    @foreach (var comment in comments)
+    {
+        <div class="comment-card">
+            <div class="comment-header">
+                <span class="comment-user">@comment.UserId</span>
+                <span class="comment-date">@comment.PostedAt.ToLocalTime().ToString("dd MMM yyyy HH:mm")</span>
+            </div>
+            <div class="comment-body">
+                @comment.Text
+            </div>
+        </div>
+    }
+</div>
+
+@if (!string.IsNullOrEmpty(userEmail))
+{
+    using (Html.BeginForm("Create", "Comments", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="DiscussionId" value="@Model.RowKey" />
+        <input type="hidden" name="UserId" value="@userEmail" />
+
+        <div class="form-group mb-2 mt-3">
+            <textarea name="Text" class="form-control" placeholder="Write your comment..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Post Comment</button>
+    }
+}
+
+<style>
+    .comments-container {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .comment-card {
+        background-color: #f8f9fa; /* svetlo siva pozadina */
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: #343a40;
+    }
+
+    .comment-user {
+        font-weight: bold;
+    }
+
+    .comment-date {
+        color: #6c757d;
+        font-size: 0.8rem;
+    }
+
+    .comment-body {
+        font-size: 1rem;
+        line-height: 1.4;
+        color: #212529;
+    }
+</style>

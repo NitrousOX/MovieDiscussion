@@ -1,0 +1,20 @@
+﻿@{
+    var userEmail = Session["Email"] as string;
+}
+
+<h4>Post a Comment</h4>
+
+@if (!string.IsNullOrEmpty(userEmail))
+{
+    using (Html.BeginForm("Create", "Comments", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="DiscussionId" value="@ViewBag.DiscussionId" />
+        <input type="hidden" name="UserId" value="@userEmail" />
+
+        <div class="form-group mb-2">
+            <textarea name="Text" class="form-control" placeholder="Write your comment..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Post Comment</button>
+    }
+}

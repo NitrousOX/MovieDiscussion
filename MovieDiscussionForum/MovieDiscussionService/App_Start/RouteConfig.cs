@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace MovieDiscussionService
@@ -13,6 +9,14 @@ namespace MovieDiscussionService
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
+            // 🟢 Nova ruta za health-monitoring endpoint
+            routes.MapRoute(
+                name: "HealthMonitoring",
+                url: "health-monitoring",
+                defaults: new { controller = "HealthMonitoring", action = "Index" }
+            );
+
+            // 🟢 Default ruta ostaje kao što je bila
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",

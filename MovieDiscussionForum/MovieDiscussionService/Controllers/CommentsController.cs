@@ -6,6 +6,9 @@ using MovieDiscussionService.Models;
 using System;
 using System.Threading.Tasks;
 using System.Web.Mvc;
+using System.Collections.Generic;
+using System.Linq; // već ti treba za OrderBy
+
 
 namespace MovieDiscussionService.Controllers
 {
@@ -38,7 +41,33 @@ namespace MovieDiscussionService.Controllers
             await notificationsQueue.AddMessageAsync(message);
 
             // Redirect to the discussion details page
-            return RedirectToAction("Details", "Discussions", new { id = newComment.DiscussionId });
+            return RedirectToAction("Details", "Discussion", new { id = newComment.DiscussionId });
         }
+
+        // GET: Comments/Comments?discussionId=xxx
+        public async Task<ActionResult> Comments(string discussionId)
+        {
+            if (string.IsNullOrEmpty(discussionId))
+                return RedirectToAction("Index", "Discussion");
+
+            CloudTable commentsTable = await StorageHelper.GetTableReferenceAsync("Comments");
+
+            var query = new TableQuery<CommentEntity>()
+                            .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, discussionId));
+
+            var comments = new List<CommentEntity>();
+            TableContinuationToken token = null;
+
+            do
+            {
+                var segment = await commentsTable.ExecuteQuerySegmentedAsync(query, token);
+                comments.AddRange(segment.Results);
+                token = segment.ContinuationToken;
+            } while (token != null);
+
+            ViewBag.DiscussionId = discussionId;
+            return View(comments.OrderBy(c => c.PostedAt).ToList());
+        }
+
     }
 }

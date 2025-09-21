@@ -135,6 +135,7 @@
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\CommentsController.cs" />
     <Compile Include="Controllers\DiscussionController.cs" />
+    <Compile Include="Controllers\HealthMonitoringController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -205,10 +206,11 @@
     <Content Include="Views\Discussion\Create.cshtml" />
     <Content Include="Views\Discussion\Edit.cshtml" />
     <Content Include="Views\Discussion\Delete.cshtml" />
+    <Content Include="Views\Comments\Comments.cshtml" />
+    <Content Include="Views\Discussion\Details.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Comments\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
