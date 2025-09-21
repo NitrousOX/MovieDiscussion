@@ -1,17 +1,15 @@
-using Microsoft.WindowsAzure;
-using Microsoft.WindowsAzure.Diagnostics;
-using Microsoft.WindowsAzure.ServiceRuntime;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Microsoft.WindowsAzure.ServiceRuntime;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Table;
 using SendGrid;
+using SendGrid.Helpers.Mail;
+using System;
+using System.Diagnostics;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NotificationService
 {
@@ -19,10 +17,35 @@ namespace NotificationService
     {
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private readonly ManualResetEvent runCompleteEvent = new ManualResetEvent(false);
-
         private CloudQueue _queue;
         private CloudTable _logTable;
         private SendGridClient _sendGridClient;
+        private HttpClient _httpClient;
+
+        public override bool OnStart()
+        {
+            ServicePointManager.SecurityProtocol = System.Net.SecurityProtocolType.Tls12;
+            ServicePointManager.DefaultConnectionLimit = 12;
+
+            string storageConn = RoleEnvironment.GetConfigurationSettingValue("StorageConnectionString");
+            var storageAccount = CloudStorageAccount.Parse(storageConn);
+
+            _queue = storageAccount.CreateCloudQueueClient().GetQueueReference(
+                RoleEnvironment.GetConfigurationSettingValue("NotificationQueueName"));
+            _queue.CreateIfNotExists();
+
+            _logTable = storageAccount.CreateCloudTableClient().GetTableReference(
+                RoleEnvironment.GetConfigurationSettingValue("NotificationLogTableName"));
+            _logTable.CreateIfNotExists();
+
+            string apiKey = RoleEnvironment.GetConfigurationSettingValue("SendGridApiKey");
+            _sendGridClient = new SendGridClient(apiKey);
+
+            _httpClient = new HttpClient();
+
+            Trace.TraceInformation("NotificationService initialized successfully.");
+            return base.OnStart();
+        }
 
         public override void Run()
         {
@@ -30,125 +53,92 @@ namespace NotificationService
 
             try
             {
-                this.RunAsync(this.cancellationTokenSource.Token).Wait();
+                RunAsync(cancellationTokenSource.Token).Wait();
+            }
+            catch (AggregateException aggEx)
+            {
+                foreach (var ex in aggEx.InnerExceptions)
+                {
+                    Trace.TraceError("RunAsync exception: " + ex.Message);
+                }
             }
             finally
             {
-                this.runCompleteEvent.Set();
+                runCompleteEvent.Set();
             }
         }
 
-        public override bool OnStart()
+
+        private async Task RunAsync(CancellationToken token)
         {
-            // Use TLS 1.2 for Service Bus connections
-            ServicePointManager.SecurityProtocol = SecurityProtocolType.Tls12;
+            string movieDiscussionUrl = RoleEnvironment.GetConfigurationSettingValue("MovieDiscussionHealthUrl");
+            string healthMonitoringUrl = RoleEnvironment.GetConfigurationSettingValue("NotificationHealthUrl");
 
-            // Set the maximum number of concurrent connections
-            ServicePointManager.DefaultConnectionLimit = 12;
+            while (!token.IsCancellationRequested)
+            {
+                await CheckServiceAsync("MovieDiscussionService", movieDiscussionUrl);
+                await CheckServiceAsync("NotificationService", healthMonitoringUrl);
 
-            // For information on handling configuration changes
-            // see the MSDN topic at https://go.microsoft.com/fwlink/?LinkId=166357.
+                await Task.Delay(TimeSpan.FromSeconds(3), token);
+            }
+        }
 
-
+        private async Task CheckServiceAsync(string serviceName, string url)
+        {
+            bool isAlive = false;
             try
             {
-                string storageConn = RoleEnvironment.GetConfigurationSettingValue("StorageConnectionString");
-                var storageAccount = CloudStorageAccount.Parse(storageConn);
-
-                string queueName = RoleEnvironment.GetConfigurationSettingValue("NotificationQueueName");
-                var queueClient = storageAccount.CreateCloudQueueClient();
-                _queue = queueClient.GetQueueReference(queueName);
-                _queue.CreateIfNotExists();
-
-                string tableName = RoleEnvironment.GetConfigurationSettingValue("NotificationLogTableName");
-                var tableClient = storageAccount.CreateCloudTableClient();
-                _logTable = tableClient.GetTableReference(tableName);
-                _logTable.CreateIfNotExists();
-
-                string apiKey = RoleEnvironment.GetConfigurationSettingValue("SendGridApiKey");
-                _sendGridClient = new SendGridClient(apiKey);
-
-                Trace.TraceInformation("NotificationService initialized successfully.");
+                var response = await _httpClient.GetAsync(url);
+                isAlive = response.IsSuccessStatusCode;
             }
-            catch (Exception e)
+            catch
             {
-                Trace.TraceError("Error during OnStart initialization: " + e.Message);
-                throw; // ako pukne, Azure ce pokusati restart
+                isAlive = false;
             }
 
+            await SaveHealthCheckAsync(serviceName, isAlive);
 
-            bool result = base.OnStart();
+            if (!isAlive)
+            {
+                Trace.TraceWarning($"{serviceName} is DOWN");
 
-            return result;
+                var to = new EmailAddress("strahinja600@gmail.com", "Strahinja");
+                var from = new EmailAddress("alerts@moviediscussion.com", "NotificationService");
+                var msg = MailHelper.CreateSingleEmail(
+                    from, to, $"⚠️ {serviceName} is DOWN",
+                    $"The service {serviceName} failed health check at {DateTime.UtcNow}.", null);
+
+                try
+                {
+                    await _sendGridClient.SendEmailAsync(msg);
+                    Trace.TraceInformation($"Alert email sent for {serviceName}");
+                }
+                catch (Exception ex)
+                {
+                    Trace.TraceError($"Failed to send alert email: {ex.Message}");
+                }
+            }
+        }
+
+        private async Task SaveHealthCheckAsync(string serviceName, bool status)
+        {
+            var entity = new DynamicTableEntity(serviceName, Guid.NewGuid().ToString());
+            entity.Properties["Status"] = new EntityProperty(status ? "OK" : "NOT_OK");
+            entity.Properties["CheckTime"] = new EntityProperty(DateTime.UtcNow);
+
+            var insertOp = TableOperation.Insert(entity);
+            await _logTable.ExecuteAsync(insertOp);
+
+            Trace.TraceInformation($"HealthCheck logged: {serviceName} = {(status ? "OK" : "NOT_OK")}");
         }
 
         public override void OnStop()
         {
-            Trace.TraceInformation("NotificationService is stopping");
-
-            try
-            {
-                this.cancellationTokenSource.Cancel();
-                this.runCompleteEvent.WaitOne();
-
-                _queue = null;
-                _logTable = null;
-                _sendGridClient = null;
-
-                Trace.TraceInformation("NotificationService resources released.");
-            }
-            catch (Exception e)
-            {
-                Trace.TraceError("Error while stopping NotificationService: " + e.Message);
-            }
-            finally
-            {
-                base.OnStop();
-
-                Trace.TraceInformation("NotificationService has stopped");
-            }
-            
-        }
-
-        private async Task RunAsync(CancellationToken cancellationToken)
-        {
-            
-            while (!cancellationToken.IsCancellationRequested)
-            {
-
-                try
-                {
-                    var msg = await _queue.GetMessageAsync();
-
-                    if(msg != null)
-                    {
-                        Trace.TraceInformation("Message received: " + msg.AsString);
-
-                        // TODO:
-                        // 1. Preuzeti detalje komentara iz baze
-                        // 2. Naci pretplacene korisnike
-                        // 3. Poslati mejlove
-                        // 4. Logovati u tabelu
-
-                        // Ako je sve proslo OK, obrisi poruku iz queue-a
-                        await _queue.DeleteMessageAsync(msg);
-
-                    }
-                    else
-                    {
-                        // Ako nema poruka, malo odspavaj
-                        await Task.Delay(3000, cancellationToken);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Trace.TraceError("Error in RunSync: " + e.Message);
-                    await Task.Delay(5000, cancellationToken);
-                }
-
-
-                
-            }
+            Trace.TraceInformation("NotificationService stopping...");
+            cancellationTokenSource.Cancel();
+            runCompleteEvent.WaitOne();
+            base.OnStop();
+            Trace.TraceInformation("NotificationService stopped.");
         }
     }
 }

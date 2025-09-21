@@ -1,31 +1,44 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ServiceDefinition name="MovieDiscussionForum" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceDefinition" schemaVersion="2015-04.2.6">
-  <WebRole name="MovieDiscussionService" vmsize="Standard_D1_v2">
-    <Sites>
-      <Site name="Web">
-        <Bindings>
-          <Binding name="Endpoint1" endpointName="Endpoint1" />
-        </Bindings>
-      </Site>
-    </Sites>
-	  <ConfigurationSettings>
-		  <Setting name="StorageConnectionString" />
-	  </ConfigurationSettings>
-    <Endpoints>
-      <InputEndpoint name="Endpoint1" protocol="http" port="80" />
-    </Endpoints>
-  </WebRole>
-  <WorkerRole name="NotificationService" vmsize="Standard_D1_v2">
-	  <ConfigurationSettings>
-		  <Setting name="StorageConnectionString" />
-		  <Setting name="NotificationQueueName"/>
-		  <Setting name="NotificationLogTableName"/>
-		  <Setting name="SendGridApiKey"/>
-	  </ConfigurationSettings>
-  </WorkerRole>
-  <WorkerRole name="HealthMonitoringService" vmsize="Standard_D1_v2">
-	  <ConfigurationSettings>
-		  <Setting name="StorageConnectionString" />
-	  </ConfigurationSettings>
-  </WorkerRole>
+
+	<!-- WebRole: MovieDiscussionService -->
+	<WebRole name="MovieDiscussionService" vmsize="Standard_D1_v2">
+		<Sites>
+			<Site name="Web">
+				<Bindings>
+					<Binding name="Endpoint1" endpointName="Endpoint1" />
+				</Bindings>
+			</Site>
+		</Sites>
+		<ConfigurationSettings>
+			<Setting name="StorageConnectionString" />
+		</ConfigurationSettings>
+		<Endpoints>
+			<InputEndpoint name="Endpoint1" protocol="http" port="80" />
+		</Endpoints>
+	</WebRole>
+
+	<!-- WorkerRole: NotificationService -->
+	<WorkerRole name="NotificationService" vmsize="Standard_D1_v2">
+		<Endpoints>
+			<InputEndpoint name="NotificationHealthEndpoint" protocol="http" port="8081" />
+		</Endpoints>
+		<ConfigurationSettings>
+			<Setting name="StorageConnectionString" />
+			<Setting name="NotificationQueueName" />
+			<Setting name="NotificationLogTableName" />
+			<Setting name="SendGridApiKey" />
+		</ConfigurationSettings>
+	</WorkerRole>
+
+	<!-- WorkerRole: HealthMonitoringService -->
+	<WorkerRole name="HealthMonitoringService" vmsize="Standard_D1_v2">
+		<ConfigurationSettings>
+			<Setting name="StorageConnectionString" />
+			<Setting name="SendGridApiKey" />
+			<Setting name="MovieDiscussionHealthUrl" />
+			<Setting name="NotificationHealthUrl" />
+		</ConfigurationSettings>
+	</WorkerRole>
+
 </ServiceDefinition>

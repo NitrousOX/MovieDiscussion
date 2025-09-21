@@ -1,44 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ServiceConfiguration serviceName="MovieDiscussionForum" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="6" osVersion="*" schemaVersion="2015-04.2.6">
-  <Role name="MovieDiscussionService">
-    <Instances count="1" />
-	  <ConfigurationSettings>
-		  <Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
-	  </ConfigurationSettings>
-  </Role>
-  <Role name="NotificationService">
-    <Instances count="3" />
-	  <ConfigurationSettings>
-		  <Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
-		  <Setting name="NotificationQueueName" value="notifications"/>
-		  <Setting name="NotificationLogTableName" value="NotificationLogs"/>
-		  <Setting name="SendGridApiKey" value="SG.PROD_SENDGRID_API_KEY"/>
-	  </ConfigurationSettings>
-  </Role>
-  <Role name="HealthMonitoringService">
-    <Instances count="1" />
-	  <ConfigurationSettings>
-		  <Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
-	  </ConfigurationSettings>
-  </Role>
-  <NetworkConfiguration>
-    <VirtualNetworkSite name="moviediscussionforumVNet" />
-    <AddressAssignments>
-      <InstanceAddress roleName="MovieDiscussionService">
-        <Subnets>
-          <Subnet name="WebTier" />
-        </Subnets>
-      </InstanceAddress>
-      <InstanceAddress roleName="NotificationService">
-        <Subnets>
-          <Subnet name="WebTier" />
-        </Subnets>
-      </InstanceAddress>
-      <InstanceAddress roleName="HealthMonitoringService">
-        <Subnets>
-          <Subnet name="WebTier" />
-        </Subnets>
-      </InstanceAddress>
-    </AddressAssignments>
-  </NetworkConfiguration>
+<ServiceConfiguration serviceName="MovieDiscussionForum"
+                      xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration"
+                      osFamily="6" osVersion="*" schemaVersion="2015-04.2.6">
+
+	<Role name="MovieDiscussionService">
+		<Instances count="1" />
+		<ConfigurationSettings>
+			<Setting name="StorageConnectionString" value="DefaultEndpointsProtocol=https;AccountName=YOUR_STORAGE;AccountKey=YOUR_KEY" />
+		</ConfigurationSettings>
+	</Role>
+
+	<Role name="NotificationService">
+		<Instances count="1" />
+		<ConfigurationSettings>
+			<Setting name="StorageConnectionString" value="DefaultEndpointsProtocol=https;AccountName=YOUR_STORAGE;AccountKey=YOUR_KEY" />
+			<Setting name="NotificationQueueName" value="notifications" />
+			<Setting name="NotificationLogTableName" value="NotificationLogs" />
+			<Setting name="SendGridApiKey" value="prepravi " />
+		</ConfigurationSettings>
+	</Role>
+
+	<Role name="HealthMonitoringService">
+		<Instances count="1" />
+		<ConfigurationSettings>
+			<Setting name="StorageConnectionString" value="DefaultEndpointsProtocol=https;AccountName=YOUR_STORAGE;AccountKey=YOUR_KEY" />
+			<Setting name="SendGridApiKey" value="prepravi" />
+			<Setting name="MovieDiscussionHealthUrl" value="https://YOUR_CLOUD_APP.azurewebsites.net/health-monitoring" />
+			<Setting name="NotificationHealthUrl" value="https://YOUR_CLOUD_APP.azurewebsites.net/notification-health" />
+		</ConfigurationSettings>
+	</Role>
+
 </ServiceConfiguration>
