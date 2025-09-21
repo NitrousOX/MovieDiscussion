@@ -28,7 +28,7 @@
 		<Instances count="1" />
 		<ConfigurationSettings>
 			<Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
-			<Setting name="SendGridApiKey" value="prepravi " />
+			<Setting name="SendGridApiKey" value="prepravi" />
 			<Setting name="MovieDiscussionHealthUrl" value="http://localhost:63026/health-monitoring"/>
 			<Setting name="NotificationHealthUrl" value="http://localhost:12346/health-monitoring" />
 		</ConfigurationSettings>

@@ -20,17 +20,12 @@
     <Instances count="1" />
 	  <ConfigurationSettings>
 		  <Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
+		 
+		  <Setting name="SendGridApiKey" value="prepravi" />
+		  <Setting name="MovieDiscussionHealthUrl" value="https://YOUR_CLOUD_APP.azurewebsites.net/health-monitoring" />
+		  <Setting name="NotificationHealthUrl" value="https://YOUR_CLOUD_APP.azurewebsites.net/notification-health" />
 	  </ConfigurationSettings>
   </Role>
-  <Role name="HealthMonitoringService">
-		<Instances count="1" />
-		<ConfigurationSettings>
-			<Setting name="StorageConnectionString" value="DefaultEndpointsProtocol=https;AccountName=YOUR_STORAGE;AccountKey=YOUR_KEY" />
-			<Setting name="SendGridApiKey" value="prepravi" />
-			<Setting name="MovieDiscussionHealthUrl" value="https://YOUR_CLOUD_APP.azurewebsites.net/health-monitoring" />
-			<Setting name="NotificationHealthUrl" value="https://YOUR_CLOUD_APP.azurewebsites.net/notification-health" />
-		</ConfigurationSettings>
-	</Role>
   <NetworkConfiguration>
     <VirtualNetworkSite name="moviediscussionforumVNet" />
     <AddressAssignments>

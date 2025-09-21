@@ -124,7 +124,7 @@ namespace NotificationService
 
         private async Task RunAsync(CancellationToken cancellationToken)
         {
-            
+
             while (!cancellationToken.IsCancellationRequested)
             {
 
@@ -132,7 +132,7 @@ namespace NotificationService
                 {
                     var msg = await _queue.GetMessageAsync();
 
-                    if(msg != null)
+                    if (msg != null)
                     {
                         Trace.TraceInformation("Message received: " + msg.AsString);
 
@@ -156,10 +156,14 @@ namespace NotificationService
                 }
                 catch (Exception e)
                 {
+                    Trace.TraceError("Error in RunSync: " + e.Message);
 
-                
+                }
+
+
             }
         }
+        
 
         private async Task ProcessMessageAsync(string commentId)
         {
@@ -218,7 +222,7 @@ namespace NotificationService
                 
             }
         }
-                    Trace.TraceError("Error in RunSync: " + e.Message);
+                   
         private async Task<List<FollowEntity>> GetFollowersAsync(string discussionId)
         {
             var followers = new List<FollowEntity>();
@@ -282,7 +286,7 @@ namespace NotificationService
 
 
                 
-            }
+            
         }
     }
 }
