@@ -24,9 +24,13 @@
 		  <Setting name="SendGridApiKey"/>
 	  </ConfigurationSettings>
   </WorkerRole>
-  <WorkerRole name="HealthMonitoringService" vmsize="Standard_D1_v2">
-	  <ConfigurationSettings>
-		  <Setting name="StorageConnectionString" />
-	  </ConfigurationSettings>
-  </WorkerRole>
+  <!-- WorkerRole: HealthMonitoringService -->
+	<WorkerRole name="HealthMonitoringService" vmsize="Standard_D1_v2">
+		<ConfigurationSettings>
+			<Setting name="StorageConnectionString" />
+			<Setting name="SendGridApiKey" />
+			<Setting name="MovieDiscussionHealthUrl" />
+			<Setting name="NotificationHealthUrl" />
+		</ConfigurationSettings>
+	</WorkerRole>
 </ServiceDefinition>

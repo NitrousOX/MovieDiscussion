@@ -1,4 +1,4 @@
-using Microsoft.WindowsAzure;
+﻿using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Diagnostics;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using System;
@@ -124,7 +124,7 @@ namespace NotificationService
 
         private async Task RunAsync(CancellationToken cancellationToken)
         {
-            
+
             while (!cancellationToken.IsCancellationRequested)
             {
 
@@ -132,13 +132,17 @@ namespace NotificationService
                 {
                     var msg = await _queue.GetMessageAsync();
 
-                    if(msg != null)
+                    if (msg != null)
                     {
                         Trace.TraceInformation("Message received: " + msg.AsString);
 
                         // TODO:
-
+                        // 1. Preuzeti detalje komentara iz baze
                         await ProcessMessageAsync(msg.AsString);
+
+                        // Ako je sve proslo OK, obrisi poruku iz queue-a
+                        await _queue.DeleteMessageAsync(msg);
+                        // 4. Logovati u tabelu
 
                         // Ako je sve proslo OK, obrisi poruku iz queue-a
                         await _queue.DeleteMessageAsync(msg);
@@ -153,13 +157,13 @@ namespace NotificationService
                 catch (Exception e)
                 {
                     Trace.TraceError("Error in RunSync: " + e.Message);
-                    await Task.Delay(5000, cancellationToken);
+
                 }
 
 
-                
             }
         }
+        
 
         private async Task ProcessMessageAsync(string commentId)
         {
@@ -218,7 +222,7 @@ namespace NotificationService
                 
             }
         }
-
+                   
         private async Task<List<FollowEntity>> GetFollowersAsync(string discussionId)
         {
             var followers = new List<FollowEntity>();
@@ -279,6 +283,10 @@ namespace NotificationService
             await _logTable.ExecuteAsync(insert);
 
             Trace.TraceInformation($"Notification logged: {email}, status={status}");
+
+
+                
+            
         }
     }
 }

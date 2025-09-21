@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ServiceConfiguration serviceName="MovieDiscussionForum" xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration" osFamily="6" osVersion="*" schemaVersion="2015-04.2.6">
+<ServiceConfiguration serviceName="MovieDiscussionForum"
+                      xmlns="http://schemas.microsoft.com/ServiceHosting/2008/10/ServiceConfiguration"
+                      osFamily="6" osVersion="*" schemaVersion="2015-04.2.6">
+
+	<!-- MovieDiscussionService Web Role -->
 	<Role name="MovieDiscussionService">
 		<Instances count="1" />
 		<ConfigurationSettings>
@@ -7,19 +11,27 @@
 			<Setting name="NotificationQueueName" value="commentnotificationsqueue"/>
 		</ConfigurationSettings>
 	</Role>
+
+	<!-- NotificationService Worker Role -->
 	<Role name="NotificationService">
 		<Instances count="1" />
 		<ConfigurationSettings>
 			<Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
-			<Setting name="NotificationQueueName" value="commentnotificationsqueue"/>
-			<Setting name="NotificationLogTableName" value="NotificationLogs"/>
-			<Setting name="SendGridApiKey" value="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"/>
+			<Setting name="NotificationQueueName" value="notifications" />
+			<Setting name="NotificationLogTableName" value="NotificationLogs" />
+			<Setting name="SendGridApiKey" value="prepraviii" />
 		</ConfigurationSettings>
 	</Role>
+
+	<!-- HealthMonitoringService Worker Role -->
 	<Role name="HealthMonitoringService">
 		<Instances count="1" />
 		<ConfigurationSettings>
 			<Setting name="StorageConnectionString" value="UseDevelopmentStorage=true" />
+			<Setting name="SendGridApiKey" value="prepravi" />
+			<Setting name="MovieDiscussionHealthUrl" value="http://localhost:63026/health-monitoring"/>
+			<Setting name="NotificationHealthUrl" value="http://localhost:12346/health-monitoring" />
 		</ConfigurationSettings>
 	</Role>
+
 </ServiceConfiguration>
